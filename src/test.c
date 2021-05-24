@@ -41,7 +41,7 @@ void sort(int arr[], int n)
     int *shellArray = intdup(arr, n);
     int *selectionArray = intdup(arr, n);
     int *heapArray = intdup(arr, n);
-
+//
     clock_t beginBubble = clock();
     bubbleSort(arr, n);
     clock_t endBubble = clock();
