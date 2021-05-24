@@ -7,6 +7,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#define BUFFER_SIZE 2048
+#define INPUT_SIZE 1000
+
 void error(const char *msg)
 {
 	perror(msg);
@@ -23,9 +26,9 @@ int main(int argc, char *argv[])
 	}
 
 	int sockfd, portno, n;
-	char buffer[2000];
-	char input[100];
-	char inputFiles[100];
+	char buffer[BUFFER_SIZE] = {0};
+	char input[INPUT_SIZE] = {0};
+	char inputFiles[INPUT_SIZE] = {0};
 	char *ptr;
 	char dlim[] = " ";
 	char actionLenght[2];
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
 	{
 
 		printf("Client: ");
-		fgets(input, 100, stdin);
+		fgets(input, INPUT_SIZE, stdin);
 
 		strcpy(inputFiles, input);
 		ptr = strtok(input, dlim);
@@ -75,14 +78,14 @@ int main(int argc, char *argv[])
 		if (n < 0)
 			error("Error on writing");
 
-		bzero(buffer, 2000);
+		bzero(buffer, BUFFER_SIZE);
 
 		n = read(sockfd, buffer, sizeof(buffer));
 
 		if (n < 0)
 			error("Error on reading");
 		printf("Server says %s\n", buffer);
-		bzero(buffer, 2000);
+		bzero(buffer, BUFFER_SIZE);
 	}
 
 	close(sockfd);

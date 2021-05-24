@@ -13,6 +13,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE 2048
+#define FILE_SIZE 100
+#define ARRAY_SIZE 1000
+#define NAME_LEN 20
+#define SORT_COUNT 4
+#define MAX_INDEX_SIZE 64
+#define BUFFER_OUT_SIZE 256
+#define ACTION_SIZE 10
+
 void error(const char *msg)
 {
     perror(msg);
@@ -35,13 +44,13 @@ int *intdup(int const *src, size_t len)
 }
 
 void *connection_handler(void *);
-void useGivenFile(char file[100], int sockfd);
-void benchmarkGivenFile(char file[100], int sockfd);
+void useGivenFile(char file[FILE_SIZE], int sockfd);
+void benchmarkGivenFile(char file[FILE_SIZE], int sockfd);
 void sort(int arr[], int n, int sockfd);
 
 typedef struct data
 {
-    char algorithmName[20];
+    char algorithmName[NAME_LEN];
     double time;
 } data;
 
@@ -114,16 +123,16 @@ void *connection_handler(void *socket_desc)
 {
     int sockfd = *(int *)socket_desc;
     int n;
-    char buffer[2000];
+    char buffer[BUFFER_SIZE];
     char actionLength[2];
-    char action[10];
-    char file[100];
+    char action[ACTION_SIZE];
+    char file[FILE_SIZE];
     int actionLenghtNo;
     char *result;
 
     puts("Client connected.");
 
-    while ((n = read(sockfd, buffer, 2000)) > 0)
+    while ((n = read(sockfd, buffer, BUFFER_SIZE)) > 0)
     {
 
         strncpy(actionLength, buffer, 2);
@@ -141,15 +150,16 @@ void *connection_handler(void *socket_desc)
         if (!strcmp(action, "SORT"))
             benchmarkGivenFile(result, sockfd);
 
-        bzero(buffer, 2000);
+        bzero(buffer, BUFFER_SIZE);
 
         strcpy(buffer, "ok");
         //write(sockfd , buffer , sizeof(buffer));
 
-        bzero(buffer, 2000);
+        // erases the data in the n bytes of the memory
+        bzero(buffer, BUFFER_SIZE);
         bzero(actionLength, 2);
-        bzero(action, 10);
-        bzero(file, 100);
+        bzero(action, ACTION_SIZE);
+        bzero(file, FILE_SIZE);
     }
 
     if (n == 0)
@@ -165,7 +175,7 @@ void *connection_handler(void *socket_desc)
     return 0;
 }
 
-void useGivenFile(char file[100], int sockfd)
+void useGivenFile(char file[FILE_SIZE], int sockfd)
 {
 
     // opening chosen file from the menu
@@ -185,24 +195,24 @@ void useGivenFile(char file[100], int sockfd)
     }
 }
 
-void benchmarkGivenFile(char file[100], int sockfd)
+void benchmarkGivenFile(char file[FILE_SIZE], int sockfd)
 {
-    char fileBuffer[2048];
-    int arr[1000];
+    char fileBuffer[BUFFER_SIZE];
+    int arr[ARRAY_SIZE];
     //read(fileDesc, fileBuffer, 2000);
     //write(sockfd, fileBuffer, sizeof(fileBuffer));
 
     // converting data from file and passing it to the array
     int i;
-    for (i = 0; i < 1001; i++)
+    for (i = 0; i < ARRAY_SIZE+1; i++)
     {
         arr[i] = fileBuffer[i] - '0';
     }
     // Doing the benchmark by calling sort()
-    sort(arr, 2048, sockfd);
+    sort(arr, BUFFER_SIZE, sockfd);
 
     printf("\n");
-    bzero(fileBuffer, 2048);
+    bzero(fileBuffer, BUFFER_SIZE);
 
     return;
 }
@@ -259,7 +269,7 @@ void sort(int arr[], int n, int sockfd)
     char res3[] = "Best time with Sellection sort: ";
     char res4[] = "Best time with Heap sort: ";
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < SORT_COUNT; i++)
     {
         // find the quickest sort
         if (time[i] < smallest)
@@ -282,39 +292,39 @@ void sort(int arr[], int n, int sockfd)
 
         snprintf(buf, sizeof buf, "%f", smallest);
         strcat(res1, buf);
-        write(sockfd, res1, 64);
+        write(sockfd, res1, MAX_INDEX_SIZE);
         break;
     case 1:
         printf("Best time with Shell sort with %f s\n", smallest);
 
         snprintf(buf, sizeof buf, "%f", smallest);
         strcat(res2, buf);
-        write(sockfd, res2, 64);
+        write(sockfd, res2, MAX_INDEX_SIZE);
         break;
     case 2:
         printf("Best time with Selection sort with %f s\n", smallest);
 
         snprintf(buf, sizeof buf, "%f", smallest);
         strcat(res3, buf);
-        write(sockfd, res3, 64);
+        write(sockfd, res3, MAX_INDEX_SIZE);
         break;
     case 3:
         printf("Best time with Heap sort with %f s\n", smallest);
 
         snprintf(buf, sizeof buf, "%f", smallest);
         strcat(res4, buf);
-        write(sockfd, res4, 64);
+        write(sockfd, res4, MAX_INDEX_SIZE);
         break;
     default:
         printf("Best time with Bubble sort with %f s\n", smallest);
 
         snprintf(buf, sizeof buf, "%f", smallest);
         strcat(res1, buf);
-        write(sockfd, res1, 64);
+        write(sockfd, res1, MAX_INDEX_SIZE);
         break;
     }
 
-    data algos[4] = {bubble, shell, selection, heap};
+    data algos[SORT_COUNT] = {bubble, shell, selection, heap};
 
     ///////////////////////////////////////////////////////
     // Write result to file -> had a problem with system call
@@ -332,9 +342,9 @@ void sort(int arr[], int n, int sockfd)
         exit(1);
     }
 
-    char buffer_out[256];
+    char buffer_out[BUFFER_OUT_SIZE];
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < SORT_COUNT; i++)
     {
         if (i != slow)
         {
