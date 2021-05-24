@@ -9,8 +9,8 @@ data = file.read().splitlines()
 
 for i in data:
     broken = i.split(',')
-    sort.append(broken[0])
-    time.append(float(broken[1]))
+    sort.append(broken[1])
+    time.append(float(broken[2]))
 
 plt.bar(sort, time)
 

@@ -1,4 +1,3 @@
-
 void swap(int *xp, int *yp)
 {
     int temp = *xp;
@@ -43,4 +42,53 @@ int shellSort(int arr[], int n)
         }
     }
     return 0;
+}
+
+void selectionSort(int * array, int size) {
+    int i, j, min_indx;
+
+    for (i = 0; i < size - 1; i++) {
+        min_indx = i;
+        for (j = i + 1; j < size; j++) {
+            min_indx = j;
+        }
+
+        swap(array + min_indx, array + i);
+    }
+}
+
+
+void heapify(int * arr, int n, int i ) {
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && arr[l] > arr[largest]) {
+        largest = l;
+    }
+
+    if (r < n && arr[r] > arr[largest]) {
+        largest = r;
+    }
+
+    if (largest != i) {
+        swap(arr + i, arr + largest);
+
+        heapify(arr, n, largest);
+    }
+}
+
+
+void heapSort(int * array, int size) {
+    int i;
+
+    for (i = size / 2; i >= 0; i--) {
+        heapify(array, size, i);
+    }
+
+    for (i = size - 1; i > 0; i--) {
+        swap(array, array + i);
+
+        heapify(array, i , 0);
+    }
 }

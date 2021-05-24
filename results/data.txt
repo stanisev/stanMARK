@@ -1,2 +1,3 @@
-Bubble Sort,0.214000
-Shell Sort,0.332000
+1,Shell Sort,0.002000
+2,Selection Sort,0.100000
+3,Heap Sort,0.002000
