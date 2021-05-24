@@ -119,7 +119,7 @@ void sort(int arr[], int n)
 
     FILE *out;
 
-    fopen_s(&out, "../results/data.txt", "w");
+    out = fopen("../results/data.txt", "w");
 
     if (out == NULL)
     {
@@ -131,8 +131,9 @@ void sort(int arr[], int n)
 
      for(int i=0; i<4;i++){
         if(i!=slow){
-            sprintf_s(buffer_out, 256, "%d,%s,%f\n", i, algos[i].algorithmName, algos[i].time);
-            fwrite(buffer_out, sizeof(char), strlen(buffer_out), out);
+          sprintf(buffer_out, "%d,%s,%f\n", i, algos[i].algorithmName, algos[i].time);
+          fwrite(buffer_out, sizeof(char), strlen(buffer_out), out);
+
         }
      }
 
