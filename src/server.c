@@ -311,9 +311,28 @@ void sort(int arr[], int n, int sockfd)
     data algos[4] = {bubble, shell, selection, heap};
     
     ///////////////////////////////////////////////////////
-    // Write result to file
-
+    // Write result to file -> had a problem with system call
+    /*
     int fd = open("result.txt", O_WRONLY | O_APPEND);
     
     write(fd, &algos, sizeof(data));
+    */
+
+    FILE *output;
+    output = fopen("data.txt", "w");
+    if (output == NULL) {
+      fprintf(stderr, "\nError to open the output file\n");
+      exit (1);
+   }
+
+   char buffer_out[256];
+
+   for(int i=0; i<4;i++){
+    if(i!=slow){
+          sprintf(buffer_out, "%d,%s,%f\n", i, algos[i].algorithmName, algos[i].time);
+          fwrite(buffer_out, sizeof(char), strlen(buffer_out), output);
+        }
+   }
+
+    fclose(output);
 }
