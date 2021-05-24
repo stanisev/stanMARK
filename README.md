@@ -13,3 +13,8 @@ Course project for system programming
 
 ### Start client:
 #### ./c 127.0.0.1 8888
+
+#### As a client you can type following commands
+#### USE filename
+#### SORT filename
+#### This program uses 4 sort algorithms and does the benchmark. In the end outputfile is generated and you can run graphEV.py script to see the graph.
