@@ -26,6 +26,12 @@ void printArray(int arr[], int size)
     printf("\n");
 }
 
+int * intdup(int const * src, size_t len)
+{
+   int * p = malloc(len * sizeof(int));
+   memcpy(p, src, len * sizeof(int));
+   return p;
+}
 
 void *connection_handler(void *);
 void useGivenFile(char file[100], int sockfd);
@@ -38,12 +44,6 @@ typedef struct data
     char algorithmName[20];
     double time;
 } data;
-
-typedef struct CONTAINER
-{
-    int id;
-    data data[4];
-} CONTAINER;
 
 
 int fileDesc;
@@ -205,100 +205,115 @@ void benchmarkGivenFile(char file[100], int sockfd) {
 void sort(int arr[], int n, int sockfd)
 {
  
+    // making dups of the array
+    int *shellArray = intdup(arr, n);
+    int *selectionArray = intdup(arr, n);
+    int *heapArray = intdup(arr, n);
+
     clock_t beginBubble = clock();
     bubbleSort(arr, n);
     clock_t endBubble = clock();
     double timeBubble = (double)(endBubble - beginBubble) / CLOCKS_PER_SEC;
-    printf("Time for bubble: %f\n", timeBubble);
+    //printf("Time for bubble: %f\n", timeBubble);
     
     clock_t beginShell = clock();
-    shellSort(arr, n);
+    shellSort(shellArray, n);
     clock_t endShell = clock();
     double timeShell = (double)(endShell - beginShell) / CLOCKS_PER_SEC;
-    printf("Time for shell: %f\n", timeShell);
+    //printf("Time for shell: %f\n", timeShell);
 
 
     clock_t beginSelection = clock();
-    selectionSort(arr, n);
+    selectionSort(selectionArray, n);
     clock_t endSelection = clock();
     double timeSelection = (double)(endSelection - beginSelection) / CLOCKS_PER_SEC;
-    printf("Time for selection: %f\n", timeSelection);
+    //printf("Time for selection: %f\n", timeSelection);
 
 
     clock_t beginHeap = clock();
-    heapSort(arr, n);
+    heapSort(heapArray, n);
     clock_t endHeap = clock();
     double timeHeap = (double)(endHeap - beginHeap) / CLOCKS_PER_SEC;
-    printf("Time for head: %f\n", timeHeap);
+    //printf("Time for head: %f\n", timeHeap);
 
     char result[] = "Time for bubble: ";
     
-    
-    char b = timeBubble+'0';
-    char c[] = "\nTime for shell: ";
-    char s = timeShell+'0';
-    char d[] = "\nTime for selection: ";
-    char sel = timeSelection+'0';
-    char e[] = "\nTime for heap: ";
-    char h = timeHeap+'0';
-    
-    strcat(result, &b);
-    strcat(result, c);
-    strcat(result, &s);
-    strcat(result, d);
-    strcat(result, &sel);
-    strcat(result, e);
-    strcat(result, &h);
-    
-    write(sockfd, result, sizeof(result));
 
     // write individual results
+
     data bubble = {"Bubble Sort", timeBubble};
     data shell = {"Shell Sort", timeShell};
     data selection = {"Selection Sort", timeSelection};
     data heap = {"Heap Sort", timeHeap};
 
-    data benchmark_d[4] = { bubble, shell, selection, heap };
-    CONTAINER container = {id, benchmark_d };
-    id++;
-    printf("ID: %d, name: %s", id, benchmark_d[0].algorithmName);
-    /*
-FILE *out;
+    float time[4] = {timeBubble, timeShell, timeSelection, timeHeap};
+    float smallest = time[0];
+    float biggest = time[0];
+    int index = 0, slow=0;
+    char buf[64] = "\nTime: ";
 
-    fopen_s(&out, "../results/data.txt", "w");
+    char res1[] = "Best time with Bubble sort: ";
+    char res2[] = "Best time with Shell sort: ";
+    char res3[] = "Best time with Sellection sort: ";
+    char res4[] = "Best time with Heap sort: ";
 
-    if (out == NULL)
-    {
-        fprintf(stderr, "\nError opend file\n");
-        exit (1);
-    }
+    for (int i = 0; i < 4; i++) {
+      // find the quickest sort
+      if (time[i] < smallest) {
+         smallest = time[i];
+         index = i;
+      }
+      // find the slowest sort
+      if(time[i]>biggest){
+         biggest = time[i];
+         slow = i;
+      }
+   }
+   switch(index) {
+    case 0:
+        
+        printf("Best time with Bubble sort with %f s\n", smallest);
 
-    char buffer_in[256], buffer_out[256];
+        snprintf(buf, sizeof buf, "%f", smallest);
+        strcat(res1, buf);
+        write(sockfd, res1, 64);
+        break;
+     case 1:
+        printf("Best time with Shell sort with %f s\n", smallest);
+        
+        snprintf(buf, sizeof buf, "%f", smallest);
+        strcat(res2, buf);
+        write(sockfd, res2, 64);
+        break;
+     case 2:
+        printf("Best time with Selection sort with %f s\n", smallest);
 
+        snprintf(buf, sizeof buf, "%f", smallest);
+        strcat(res3, buf);
+        write(sockfd, res3, 64);
+        break;
+     case 3:
+        printf("Best time with Heap sort with %f s\n", smallest);
+        
+        snprintf(buf, sizeof buf, "%f", smallest);
+        strcat(res4, buf);
+        write(sockfd, res4, 64);
+        break;
+    default:
+        printf("Best time with Bubble sort with %f s\n", smallest);
 
-     data bubble = {"Bubble Sort", timeBubble};
-     data shell = {"Shell Sort", timeShell};
+        snprintf(buf, sizeof buf, "%f", smallest);
+        strcat(res1, buf);
+        write(sockfd, res1, 64);
+        break;
+   }
 
-     sprintf_s(buffer_out, 256, "%s,%f\n", bubble.fname, bubble.time);
-     fwrite(buffer_out, sizeof(char), strlen(buffer_out), out);
+    data algos[4] = {bubble, shell, selection, heap};
+    
+    ///////////////////////////////////////////////////////
+    // Write result to file
 
-     sprintf_s(buffer_out, 256, "%s,%f\n", shell.fname, shell.time);
-     fwrite(buffer_out, sizeof(char), strlen(buffer_out), out);
-
-
-    printf("\n");
-
-     FILE *inf;
-    struct data inp;
-    inf = fopen ("../results/data.txt", "r");
-    if (inf == NULL) {
-       fprintf(stderr, "\nError to open the file\n");
-       exit (1);
-    }
-    while(fread(&inp, sizeof(struct data), 1, inf))
-       printf ("Sort = %s time = %f\n", inp.fname, inp.time);
-    fclose (inf);
-
-
-    */
+    int fd = open("result.txt", O_WRONLY | O_APPEND);
+    
+    write(fd, &algos, sizeof(data));
 }
