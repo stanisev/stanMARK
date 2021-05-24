@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
 	int sockfd,  portno, n;
 	char buffer[2000];
 	char input[100];
-	char inputBook[100];
+	char inputFiles[100];
 	char *ptr;
 	char dlim[]=" ";
 	char actionLenght[2];
@@ -55,16 +55,16 @@ int main(int argc, char *argv[]){
 		printf("Client: ");
 		fgets(input, 100, stdin);
 
-		strcpy(inputBook, input);
+		strcpy(inputFiles, input);
 		ptr = strtok(input, dlim);
 		actionCharNo = strlen(ptr);
 		sprintf(actionLenght, "%d", actionCharNo);
 
-		strcpy(inputBook, inputBook+actionCharNo+1);
+		strcpy(inputFiles, inputFiles+actionCharNo+1);
 
 		strcpy(buffer, actionLenght);
 		strcpy(buffer+1, ptr);
-		strcpy(buffer+actionCharNo+1, inputBook);
+		strcpy(buffer+actionCharNo+1, inputFiles);
 
 		n = write(sockfd, buffer, sizeof(buffer));
 		if(n < 0)
