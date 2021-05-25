@@ -258,11 +258,11 @@ void sort(int arr[], int n, int sockfd)
     data selection = {"Selection Sort", timeSelection};
     data heap = {"Heap Sort", timeHeap};
 
-    float time[4] = {timeBubble, timeShell, timeSelection, timeHeap};
+    float time[SORT_COUNT] = {timeBubble, timeShell, timeSelection, timeHeap};
     float smallest = time[0];
     float biggest = time[0];
     int index = 0, slow = 0;
-    char buf[64] = "\nTime: ";
+    char buf[MAX_INDEX_SIZE] = "\nTime: ";
 
     char res1[] = "Best time with Bubble sort: ";
     char res2[] = "Best time with Shell sort: ";
