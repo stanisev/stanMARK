@@ -123,10 +123,10 @@ void *connection_handler(void *socket_desc)
 {
     int sockfd = *(int *)socket_desc;
     int n;
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE] = {0};
     char actionLength[2];
-    char action[ACTION_SIZE];
-    char file[FILE_SIZE];
+    char action[ACTION_SIZE] = {0};
+    char file[FILE_SIZE] = {0};
     int actionLenghtNo;
     char *result;
 
