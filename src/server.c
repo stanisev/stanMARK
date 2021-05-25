@@ -123,10 +123,10 @@ void *connection_handler(void *socket_desc)
 {
     int sockfd = *(int *)socket_desc;
     int n;
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE] = {0};
     char actionLength[2];
-    char action[ACTION_SIZE];
-    char file[FILE_SIZE];
+    char action[ACTION_SIZE] = {0};
+    char file[FILE_SIZE] = {0};
     int actionLenghtNo;
     char *result;
 
@@ -199,7 +199,7 @@ void benchmarkGivenFile(char file[FILE_SIZE], int sockfd)
 {
     char fileBuffer[BUFFER_SIZE];
     int arr[ARRAY_SIZE];
-    //read(fileDesc, fileBuffer, 2000);
+    read(fileDesc, fileBuffer, BUFFER_SIZE);
     //write(sockfd, fileBuffer, sizeof(fileBuffer));
 
     // converting data from file and passing it to the array
@@ -258,11 +258,11 @@ void sort(int arr[], int n, int sockfd)
     data selection = {"Selection Sort", timeSelection};
     data heap = {"Heap Sort", timeHeap};
 
-    float time[4] = {timeBubble, timeShell, timeSelection, timeHeap};
+    float time[SORT_COUNT] = {timeBubble, timeShell, timeSelection, timeHeap};
     float smallest = time[0];
     float biggest = time[0];
     int index = 0, slow = 0;
-    char buf[64] = "\nTime: ";
+    char buf[MAX_INDEX_SIZE] = "\nTime: ";
 
     char res1[] = "Best time with Bubble sort: ";
     char res2[] = "Best time with Shell sort: ";
@@ -335,7 +335,7 @@ void sort(int arr[], int n, int sockfd)
     */
 
     FILE *output;
-    output = fopen("data.txt", "w");
+    output = fopen("../results/data.txt", "w");
     if (output == NULL)
     {
         fprintf(stderr, "\nError to open the output file\n");
@@ -353,5 +353,7 @@ void sort(int arr[], int n, int sockfd)
         }
     }
 
+	char benchmarkSuccess[] = "Successfully benchmark-ed the file\n";
+	write(sockfd, benchmarkSuccess, sizeof(benchmarkSuccess));
     fclose(output);
 }
