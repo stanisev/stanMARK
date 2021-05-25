@@ -199,7 +199,7 @@ void benchmarkGivenFile(char file[FILE_SIZE], int sockfd)
 {
     char fileBuffer[BUFFER_SIZE];
     int arr[ARRAY_SIZE];
-    //read(fileDesc, fileBuffer, 2000);
+    read(fileDesc, fileBuffer, BUFFER_SIZE);
     //write(sockfd, fileBuffer, sizeof(fileBuffer));
 
     // converting data from file and passing it to the array
@@ -335,7 +335,7 @@ void sort(int arr[], int n, int sockfd)
     */
 
     FILE *output;
-    output = fopen("data.txt", "w");
+    output = fopen("../results/data.txt", "w");
     if (output == NULL)
     {
         fprintf(stderr, "\nError to open the output file\n");
@@ -353,5 +353,7 @@ void sort(int arr[], int n, int sockfd)
         }
     }
 
+	char benchmarkSuccess[] = "Successfully benchmark-ed the file\n";
+	write(sockfd, benchmarkSuccess, sizeof(benchmarkSuccess));
     fclose(output);
 }
